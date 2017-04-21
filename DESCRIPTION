@@ -1,0 +1,15 @@
+Package: cwl
+Type: Package
+Title: Common workflow language support
+Version: 0.0.0.9000
+Authors@R: c(	
+  person( "Stuart", "Jefferys",	
+    email= "srjefferys@gmail.com", role= c( "aut", "cre" ))	
+ )
+Description: Parse and work with the common workflow language (cwl). See
+    http://www.commonwl.org.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Suggests: testthat
