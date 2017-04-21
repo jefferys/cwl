@@ -1,0 +1,38 @@
+---
+title: "Introduction to CWL"
+author: "Stuart R. Jefferys"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to CWL}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+For a quick overview, see the README.
+
+# What is this package?
+
+This package is an R implementation of the Common Workflow Language (cwl) as described at http://www.commonwl.org. It is currently only a stub in which various representations and algorithms are being played with. If this works out, it may become a native R runner for command line tools and workflows.
+
+## From a users perspective
+
+The most important early milestone for a user is the ability to run a command line tool by invoking a runner when passed a command line tool (\*.cwl) and its associated parameter file (\*.yaml). Most of the exported components in this package aimed at developers. The only functions a basic user will need to use is:
+
+* `cwlRun(     "tool.cwl", "data.yml" )` - Run a command line tool.
+* `cwlCommand( "tool.cwl", "data.yml" )` - Return the command line to run.
+
+An advanced user might also care about
+
+* `cwlToolObj <- cwlParse( "tool.cwl" )` - Load the cwl description of a tool.
+* `cwlDataObj <- cwlParse( "data.yml" )` - Load a yaml file as run data.
+
+Objects can be used instead of files with the `cwlRun` and `cwlCommand` functions, separating input file structure from internal representations and allowing post processing in R by an advanced user before running.
+        
+## From a developers perspective
+
+To run a command line file, the cwl has to be parsed into an internal representation that can then be called via system2 on the local machine. Much of the code in this package involves translation into and out of this internal representation. The objects and functions for working with the cwl are all exported, but are part of a "developer library" interface. Users should not need to use any of this machinery.
+
+# Some small examples
+
+# Some complex examples.
