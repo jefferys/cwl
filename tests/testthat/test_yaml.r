@@ -15,8 +15,18 @@ describe( "Testing test setup", {
 
 describe( "readCwlData() - a user API function ", {
   describe( "readCwlData() - Examples work as described", {
-    got <- readCwlData(helloWorldDataFileName)
-    want <- helloWorldDataFileName
+    cwlDataObj <- readCwlData(helloWorldDataFileName)
+
+    got <- class(cwlDataObj)
+    want <- c("cwlDataYaml", "list")
+    expect_equal( got, want )
+
+    got <- length(cwlDataObj)
+    want <- 1
+    expect_equal( got, want )
+
+    got <- cwlDataObj$message
+    want <- "Hello world!"
     expect_equal( got, want )
   })
 
