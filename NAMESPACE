@@ -2,3 +2,4 @@
 
 export(hello)
 export(readCwlData)
+export(readCwlTool)

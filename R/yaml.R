@@ -38,3 +38,26 @@ readCwlData <- function( file ) {
     class= c("cwlDataYaml", "list")
   )
 }
+
+#' Read in a tool cwl file
+#'
+#' Reads in a tool cwl file (in yaml format) and returns an S3 "cwlTool"
+#' object. This object is essentially just the cwl yaml file read in as a named
+#' list, and will work as a list if used as such. Parsing the cwl yaml file is
+#' done via the CRAN "yaml" package yaml.load_file function.
+#'
+#' @param file The name of the cwl tool file to read in
+#'
+#' @return The tool.cwl as an object that can be used by a runner. This object is
+#' essentially just a named list with each key being an element of the cwl yaml
+#' file.
+#'
+#' @examples
+#' # TODO: Hello world example
+#' @export
+readCwlTool <- function( file ) {
+  structure(
+    yaml::yaml.load_file(file),
+    class= c("cwlTool", "list")
+  )
+}
