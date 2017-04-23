@@ -21,6 +21,39 @@ list, and will work as a list if used as such. Parsing the cwl yaml file is
 done via the CRAN "yaml" package yaml.load_file function.
 }
 \examples{
-# TODO: Hello world example
+file <- tempfile()
+data <- c(
+  "cwlVersion: v1.0",
+  "class: CommandLineTool",
+  "baseCommand: echo",
+  "inputs:",
+  "  message:",
+ "    type: string",
+  "    inputBinding:",
+  "      position: 1",
+  "outputs: []"
+)
+writeLines(data, file)
+
+cwlToolObj <- readCwlTool(file)
+class(cwlToolObj)
+#> [1] "cwlToolObj" "list"
+
+length(cwlToolObj)
+#> [1] 5
+
+str(cwlToolObj)
+#> List of 5
+#> $ cwlVersion : chr "v1.0"
+#> $ class      : chr "CommandLineTool"
+#> $ baseCommand: chr "echo"
+#> $ inputs     :List of 1
+#> ..$ message:List of 2
+#> .. ..$ type        : chr "string"
+#> .. ..$ inputBinding:List of 1
+#> .. .. ..$ position: int 1
+#> $ outputs    : list()
+#> - attr(*, "class")= chr [1:2] "cwlTool" "list"
+
 }
 
