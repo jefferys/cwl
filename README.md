@@ -3,32 +3,20 @@
 cwl - Common workflow language support
 ======================================
 
-Parse and work with the common workflow language, cwl. (See <http://www.commonwl.org>).
+This package (cwl) is designed to parse and work with the Common Workflow Language, CWL. ( <http://www.commonwl.org>). It currently does very little, it is only a stub in which various representations and algorithms are being played with. The first 0.0.1 release will be able to run simple command line programs locally using a very limited subset of CWL.
 
-Some simple examples
---------------------
+Simple command line tool examples.
+----------------------------------
 
-### Hello world.
-
-This example runs a simple hello world example.
+These assume you already have a *tool.cwl* and a *data.yaml* file. See the introductory vignette for details and sample files.
 
 ``` r
-library(cwl)
+# Run a tool directly from files
+cwlRun( "tool.cwl", "data.yaml")
 
-# Set up a simple data.yml file
-fileName <- tempfile()
-data <- c( "message: Hello world!", "" )
-writeLines(data, fileName)
-
-# Load the data file as an object
-cwlDataObj <- readCwlData(fileName)
-
-# Examine the data file object
-class(cwlDataObj)
-#> [1] "cwlDataYaml" "list"
-length(cwlDataObj)
-#> [1] 1
-cwlDataObj[1]
-#> $message
-#> [1] "Hello world!"
+# Run a tool indirectly via object intermediaries.
+# Allows interaction with the tool and data info before running.
+toolObj <- readCwlTool( "tool.cwl" )
+dataObj <- readCwlData( "data.yaml" )
+cwlRun( toolObj, dataObj)
 ```

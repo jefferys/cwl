@@ -9,30 +9,98 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## Overview
+
 For a quick overview, see the README.
 
-# What is this package?
+### From a users perspective
 
-This package is an R implementation of the Common Workflow Language (cwl) as described at http://www.commonwl.org. It is currently only a stub in which various representations and algorithms are being played with. If this works out, it may become a native R runner for command line tools and workflows.
+The most important early milestone for a user is the ability to run a command line tool by invoking a runner. This runner has two required parameters, the command line tool CWL _"tool.cwl"_ and its associated parameter or data file _"data.yaml"_. Most of the exported components in this package are aimed at developers. The only functions a basic user will need to use is:
 
-## From a users perspective
-
-The most important early milestone for a user is the ability to run a command line tool by invoking a runner when passed a command line tool (\*.cwl) and its associated parameter file (\*.yaml). Most of the exported components in this package aimed at developers. The only functions a basic user will need to use is:
-
-* `cwlRun(     "tool.cwl", "data.yml" )` - Run a command line tool.
-* `cwlCommand( "tool.cwl", "data.yml" )` - Return the command line to run.
+* `cwlRun(     "tool.cwl", "data.yaml" )` - Run a command line tool.
+* `cwlCommand( "tool.cwl", "data.yaml" )` - Return a command line (as string/s).
 
 An advanced user might also care about
 
-* `cwlToolObj <- cwlParse( "tool.cwl" )` - Load the cwl description of a tool.
-* `cwlDataObj <- cwlParse( "data.yml" )` - Load a yaml file as run data.
+* `cwlToolObj <- cwlParse( "tool.cwl" )` - Load the CWL description of a tool.
+* `cwlDataObj <- cwlParse( "data.yaml" )` - Load a yaml file as run data.
 
-Objects can be used instead of files with the `cwlRun` and `cwlCommand` functions, separating input file structure from internal representations and allowing post processing in R by an advanced user before running.
+Objects can be used instead of files with the `cwlRun` and `cwlCommand` functions, separating input file structure from internal representations. This allows prior processing or even generation of the needed data for running.
         
-## From a developers perspective
+### From a developers perspective
 
-To run a command line file, the cwl has to be parsed into an internal representation that can then be called via system2 on the local machine. Much of the code in this package involves translation into and out of this internal representation. The objects and functions for working with the cwl are all exported, but are part of a "developer library" interface. Users should not need to use any of this machinery.
+To run a command line file, the CWL has to be parsed into an internal representation that can then be called on the local machine. Much of the code in this package involves translation into and out of this internal representation. The objects and functions for working with the CWL are all exported, but are part of a "developer library" interface. Users should not need to use any of this machinery.
 
-# Some small examples
+## What is CWL?
 
-# Some complex examples.
+CWL comes in two main flavors, "CommandLineTool" and "Workflow." The command line tool CWL describes how to run a program, the workflow CWL describes how to bind multiple programs together into a composite pipeline or workflow. In a Workflow, steps are represented by CommandLineTools, or by other Workflows.
+
+A "CommandLineTool" CWL is generally a file that describes a command line program. It is usually named after the program it describes, "_tool_.cwl". Representing program APIs in a common generic way allows calling them from a common runner framework. The "_tool_.cwl" also includes a description of the resources the tool needs and the outputs it generates. This last is especially important as without a description of outputs it is not possible to bind the output of one program to the input of another, and without that it is not possible to build workflows.
+
+Independent of a workflow, a command line tool can be run by a "cwl-runner". This runner needs to know the CWL for a tool, but also needs run data. For programs run from the shell, run data is provided as a list of strings, formatted as key=value parameters and/or positioned arguments. A cwl-runner takes this data in as yaml, essentially just a file that lists _`key: values`_ where the keys are defined inputs in the _tool.cwl_. Often these are simple strings, integers, or decimals, but they can be arrays, files, directories, streams, etc.
+
+## Some small examples
+
+In these examples, we could have called `library(cwl)` to import the cwl package, but we choose explicit `cwl::` scoped calls to draw attention to the cwl API functions used. Unscoped calls would have worked just as well if the 'cwl' package had been imported.
+
+### Hello world.
+
+This example runs a simple hello world example. It uses the `echo` program to print the message "Hello, world!". 
+
+#### The tool CWL file
+
+Programs are represented by _*.cwl_ files. These are a generic, reusable component describing the program. Here we are creating an _echo.cwl_ file to describe the echo program. To provide this _tool.cwl_ file we create it as a temporary file programmatically. You would generally create this file manually, or use one created for you.
+
+```{r}
+echo.cwl <- tempfile("echo", fileext="cwl")
+data <- c(
+  "cwlVersion: v1.0",
+  "class: CommandLineTool",
+  "baseCommand: echo",
+  "inputs:",
+  "  message:",
+  "    type: string",
+  "    inputBinding:",
+  "      position: 1",
+  "outputs: []"
+)
+writeLines(data, echo.cwl)
+```
+
+Now that we have a _tool.cwl_ file, we load it using `readCwlTool()`. This returns an object that is basically a nested list of all the yaml elements.
+
+```{r}
+# Load the tool cwl file as an object.
+
+cwlToolObj <- cwl::readCwlTool(echo.cwl)
+
+class(cwlToolObj)
+length(cwlToolObj)
+str(cwlToolObj)
+```
+
+#### The data file
+
+To provide the data needed by a run of the file we create it as a temporary file programatically. You could create the data file manually.
+
+```{r}
+# Set up a simple data.yaml file
+helloData.yaml <- tempfile("helloData", fileext="yaml")
+data <- c( "message: Hello, World!", "" )
+writeLines(data, helloData.yaml)
+```
+
+Now that we have a data file, we load it using `readCwlData()`. This returns an object that is basically a nested list of all the yaml elements, although here there is only one element.
+
+```{r}
+# Load the data file as an object
+cwlDataObj <- cwl::readCwlData(helloData.yaml)
+
+# Examine the data file object
+class(cwlDataObj)
+length(cwlDataObj)
+cwlDataObj[1]
+```
+
+
+## Some complex examples.
